@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        PlantCare - Plant Disease Detection
+    </title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Google Font -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<header>
+
+    <div class="logo">
+        🌿 PlantCare
+    </div>
+
+
+    <nav>
+
+        <a href="#home">
+            Home
+        </a>
+
+        <a href="#uploadSection">
+            Plant Detection
+        </a>
+
+        <a href="#uploadSection">
+            Disease Detection
+        </a>
+
+        <a href="#resultSection">
+            Treatments
+        </a>
+
+        <a href="#about">
+            About
+        </a>
+
+    </nav>
+
+</header>
+
+
+
+<!-- =========================================
+     HERO SECTION
+========================================= -->
+
+<section
+    class="hero"
+    id="home"
+>
+
+    <div class="overlay">
+
+        <h1>
+            Plant Identification & Crop Disease Detection
+        </h1>
+
+
+        <p>
+            Identify plants, detect diseases, and receive
+            treatment recommendations using AI-powered
+            image analysis.
+        </p>
+
+
+        <div class="hero-buttons">
+
+
+            <!-- Upload Button -->
+
+            <button
+                id="uploadBtn"
+                type="button"
+            >
+
+                <i class="fa-solid fa-image"></i>
+
+                Upload Image
+
+            </button>
+
+
+            <!-- Camera Button -->
+
+            <button
+                id="cameraBtn"
+                type="button"
+            >
+
+                <i class="fa-solid fa-camera"></i>
+
+                Open Camera
+
+            </button>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================
+     FEATURES
+========================================= -->
+
+<section class="features">
+
+
+    <div class="feature-card">
+
+        <i class="fa-solid fa-seedling"></i>
+
+        <h3>
+            Plant Identification
+        </h3>
+
+        <p>
+            Identify supported crops using leaf images.
+        </p>
+
+    </div>
+
+
+
+    <div class="feature-card">
+
+        <i class="fa-solid fa-virus"></i>
+
+        <h3>
+            Disease Detection
+        </h3>
+
+        <p>
+            Detect common crop diseases using AI.
+        </p>
+
+    </div>
+
+
+
+    <div class="feature-card">
+
+        <i class="fa-solid fa-leaf"></i>
+
+        <h3>
+            Treatment
+        </h3>
+
+        <p>
+            Receive basic treatment recommendations.
+        </p>
+
+    </div>
+
+
+
+    <div class="feature-card">
+
+        <i class="fa-solid fa-language"></i>
+
+        <h3>
+            Languages
+        </h3>
+
+        <p>
+            Regional language support can be added.
+        </p>
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =========================================
+     UPLOAD IMAGE SECTION
+========================================= -->
+
+<section
+    id="uploadSection"
+    class="upload-section"
+>
+
+
+    <h2>
+        🌿 Upload Plant Leaf
+    </h2>
+
+
+    <p class="section-description">
+
+        Upload a clear crop leaf image for plant
+        identification and disease detection.
+
+    </p>
+
+
+    <!-- Hidden File Input -->
+
+    <input
+        type="file"
+        id="imageInput"
+        accept="image/jpeg,image/png"
+        hidden
+    >
+
+
+
+    <!-- Upload Box -->
+
+    <div
+        id="uploadBox"
+        class="upload-box"
+    >
+
+
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+
+
+        <h3>
+            Select Plant Image
+        </h3>
+
+
+        <p>
+            JPG, JPEG or PNG
+        </p>
+
+
+        <button
+            id="chooseImageBtn"
+            type="button"
+        >
+
+            <i class="fa-solid fa-image"></i>
+
+            Choose Image
+
+        </button>
+
+
+    </div>
+
+
+
+    <!-- Image Preview -->
+
+    <div
+        id="previewContainer"
+        class="preview-container"
+    >
+
+
+        <h3>
+            Selected Image
+        </h3>
+
+
+        <img
+            id="imagePreview"
+            src=""
+            alt="Selected plant image"
+        >
+
+
+        <p id="fileName"></p>
+
+
+
+        <div class="preview-buttons">
+
+
+            <button
+                id="changeImageBtn"
+                type="button"
+            >
+
+                <i class="fa-solid fa-rotate"></i>
+
+                Change Image
+
+            </button>
+
+
+            <button
+                id="removeImageBtn"
+                type="button"
+            >
+
+                <i class="fa-solid fa-trash"></i>
+
+                Remove
+
+            </button>
+
+
+            <button
+                id="detectBtn"
+                type="button"
+            >
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                Detect Plant & Disease
+
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =========================================
+     CAMERA SECTION
+========================================= -->
+
+<section
+    id="cameraSection"
+    class="camera-section"
+>
+
+
+    <h2>
+        📷 Capture Plant Leaf
+    </h2>
+
+
+    <p class="section-description">
+
+        Place the plant leaf clearly in front
+        of the camera.
+
+    </p>
+
+
+
+    <div class="camera-box">
+
+
+        <!-- Live Camera Preview -->
+
+        <video
+            id="cameraVideo"
+            autoplay
+            playsinline
+        >
+        </video>
+
+
+
+        <!-- Hidden Canvas Used To Capture Image -->
+
+        <canvas
+            id="cameraCanvas"
+        >
+        </canvas>
+
+
+
+        <!-- Captured Image Preview -->
+
+        <img
+            id="capturedImage"
+            src=""
+            alt="Captured plant image"
+        >
+
+
+
+        <!-- Camera Buttons -->
+
+        <div class="camera-buttons">
+
+
+            <!-- Capture -->
+
+            <button
+                id="captureBtn"
+                type="button"
+            >
+
+                <i class="fa-solid fa-camera"></i>
+
+                Capture Photo
+
+            </button>
+
+
+
+            <!-- Retake -->
+
+            <button
+                id="retakeBtn"
+                type="button"
+            >
+
+                <i class="fa-solid fa-rotate"></i>
+
+                Retake
+
+            </button>
+
+
+
+            <!-- Detect Captured Image -->
+
+            <button
+                id="cameraDetectBtn"
+                type="button"
+            >
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                Detect Plant & Disease
+
+            </button>
+
+
+
+            <!-- Close Camera -->
+
+            <button
+                id="closeCameraBtn"
+                type="button"
+            >
+
+                <i class="fa-solid fa-xmark"></i>
+
+                Close Camera
+
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =========================================
+     AI RESULT SECTION
+========================================= -->
+
+<section
+    id="resultSection"
+    class="result-section"
+>
+
+
+    <h2>
+        🌿 AI Analysis Result
+    </h2>
+
+
+
+    <div class="result-card">
+
+
+        <!-- Top Result Cards -->
+
+        <div class="result-top">
+
+
+            <!-- Plant -->
+
+            <div class="result-item">
+
+                <h3>
+                    🌱 Plant
+                </h3>
+
+                <p id="resultPlant">
+                    -
+                </p>
+
+            </div>
+
+
+
+            <!-- Disease -->
+
+            <div class="result-item">
+
+                <h3>
+                    🦠 Disease
+                </h3>
+
+                <p id="resultDisease">
+                    -
+                </p>
+
+            </div>
+
+
+
+            <!-- Confidence -->
+
+            <div class="result-item">
+
+                <h3>
+                    🤖 AI Confidence
+                </h3>
+
+                <p id="resultConfidence">
+                    -
+                </p>
+
+            </div>
+
+            <div class="top-predictions-box">
+
+    <h3>
+        🤖 Top 3 AI Predictions
+    </h3>
+
+    <div id="topPredictions">
+    </div>
+
+</div>
+
+
+        </div>
+
+        <div class="result-item">
+
+    <h3>
+        🍂 Severity
+    </h3>
+
+    <p id="resultSeverity">
+        -
+    </p>
+
+</div>
+
+
+<div class="result-item">
+
+    <h3>
+        📉 Affected Area
+    </h3>
+
+    <p id="resultAffected">
+        -
+    </p>
+
+</div>
+
+<!-- =====================================
+     AFFECTED REGION VISUALIZATION
+===================================== -->
+
+<div class="detection-visualization">
+
+    <h3>
+        🔬 AI Affected Region Analysis
+    </h3>
+
+    <p class="visualization-note">
+        Highlighted regions show areas detected by
+        image processing as potentially affected.
+    </p>
+
+
+    <div class="comparison-images">
+
+
+        <div class="comparison-card">
+
+            <h4>
+                Original Leaf
+            </h4>
+
+            <img
+                id="resultOriginalImage"
+                src=""
+                alt="Original leaf image"
+            >
+
+        </div>
+
+
+        <div class="comparison-card">
+
+            <h4>
+                Detected Affected Region
+            </h4>
+
+            <img
+                id="resultHighlightedImage"
+                src=""
+                alt="Detected affected region"
+            >
+
+            <p class="highlight-note">
+                🔴 Highlight = Estimated affected area
+            </p>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+        <!-- Information -->
+
+        <div class="result-info">
+
+            <h3>
+                ℹ️ About the Condition
+            </h3>
+
+            <p id="resultInformation">
+                -
+            </p>
+
+        </div>
+
+
+
+        <!-- Treatment -->
+
+        <div class="result-info treatment-box">
+
+            <h3>
+                🌿 Recommended Treatment
+            </h3>
+
+            <p id="resultTreatment">
+                -
+            </p>
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+<section
+    id="modelEvaluation"
+    class="evaluation-section"
+>
+
+    <h2>
+        📊 AI Model Performance
+    </h2>
+
+    <p class="evaluation-description">
+        Performance calculated using the separate
+        20% unseen test dataset.
+    </p>
+
+
+    <div class="metrics-grid">
+
+
+        <div class="metric-card">
+
+            <h3>
+                🎯 Accuracy
+            </h3>
+
+            <p id="metricAccuracy">
+                -
+            </p>
+
+            <span>
+                Overall correct predictions
+            </span>
+
+        </div>
+
+
+        <div class="metric-card">
+
+            <h3>
+                ✅ Precision
+            </h3>
+
+            <p id="metricPrecision">
+                -
+            </p>
+
+            <span>
+                How reliable positive predictions are
+            </span>
+
+        </div>
+
+
+        <div class="metric-card">
+
+            <h3>
+                🔍 Recall
+            </h3>
+
+            <p id="metricRecall">
+                -
+            </p>
+
+            <span>
+                Correctly detected actual cases
+            </span>
+
+        </div>
+
+
+        <div class="metric-card">
+
+            <h3>
+                🧪 Sensitivity
+            </h3>
+
+            <p id="metricSensitivity">
+                -
+            </p>
+
+            <span>
+                Same measurement as Recall
+            </span>
+
+        </div>
+
+
+        <div class="metric-card">
+
+            <h3>
+                📈 F1 Score
+            </h3>
+
+            <p id="metricF1">
+                -
+            </p>
+
+            <span>
+                Balance of Precision and Recall
+            </span>
+
+        </div>
+
+
+        <div class="metric-card">
+
+            <h3>
+                🖼 Test Images
+            </h3>
+
+            <p id="metricTestImages">
+                -
+            </p>
+
+            <span>
+                Unseen images used for evaluation
+            </span>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="formula-box">
+
+        <h3>
+            📐 Evaluation Formulas
+        </h3>
+
+        <p>
+            Accuracy =
+            (TP + TN) /
+            (TP + TN + FP + FN)
+        </p>
+
+        <p>
+            Precision =
+            TP / (TP + FP)
+        </p>
+
+        <p>
+            Recall / Sensitivity =
+            TP / (TP + FN)
+        </p>
+
+        <p>
+            F1 Score =
+            2 ×
+            (Precision × Recall) /
+            (Precision + Recall)
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     ABOUT SECTION
+========================================= -->
+
+<section
+    id="about"
+    class="about-section"
+>
+
+
+    <h2>
+        About PlantCare
+    </h2>
+
+
+    <p>
+
+        PlantCare is an AI-based plant identification
+        and crop disease detection system.
+
+        Users can upload an existing plant leaf image
+        or capture a new image using the camera.
+
+        The image is sent to the Flask backend where
+        the trained AI model analyzes it and returns
+        the plant name, disease, confidence score,
+        condition information and basic treatment
+        recommendations.
+
+    </p>
+
+
+</section>
+
+
+
+<!-- =========================================
+     FOOTER
+========================================= -->
+
+<footer>
+
+    © 2026 PlantCare | Sustainable Agriculture
+
+</footer>
+
+
+
+<!-- =========================================
+     JAVASCRIPT
+========================================= -->
+
+<button class="plantcare-chat-launcher" id="chatLauncher" type="button" aria-label="Open PlantCare assistant" aria-expanded="false">🌿 Ask PlantCare</button>
+<aside class="plantcare-chat-panel" id="chatPanel" aria-label="PlantCare assistant" aria-hidden="true">
+  <div class="plantcare-chat-header">
+    <div><strong>PlantCare Assistant</strong><span>General crop health guidance</span></div>
+    <button id="chatClose" type="button" aria-label="Close assistant">×</button>
+  </div>
+  <div class="plantcare-chat-messages" id="chatMessages" aria-live="polite">
+    <div class="plantcare-chat-message bot">Hello! Ask me about crop diseases, symptoms, prevention, or general plant care.</div>
+  </div>
+  <div class="plantcare-chat-quick">
+    <button type="button" data-question="How can I prevent crop diseases?">Disease prevention</button>
+    <button type="button" data-question="What is early blight?">Early blight</button>
+    <button type="button" data-question="Tell me about tomato diseases">Tomato diseases</button>
+  </div>
+  <form class="plantcare-chat-form" id="chatForm">
+    <input id="chatInput" type="text" maxlength="500" placeholder="Ask about plant health…" autocomplete="off" aria-label="Your question">
+    <button type="submit" aria-label="Send message">➤</button>
+  </form>
+  <p class="plantcare-chat-note">Educational guidance only. Confirm treatment decisions with a local agricultural expert.</p>
+</aside>
+<script src="script.js"></script>
+
+
+</body>
+
+</html>

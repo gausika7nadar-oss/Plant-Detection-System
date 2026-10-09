@@ -1,0 +1,11 @@
+
+inner-git-backup/
+inner-git-original/
+**/.venv/
+**/dataset/
+**/Dataset/
+*.keras
+*.h5
+**/uploads/
+**/__pycache__/
+.env

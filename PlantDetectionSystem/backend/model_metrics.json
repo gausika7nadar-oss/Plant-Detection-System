@@ -1,0 +1,8 @@
+{
+    "accuracy": 95.77,
+    "precision": 95.85,
+    "recall": 95.77,
+    "sensitivity": 95.77,
+    "f1_score": 95.73,
+    "test_images": 1939
+}
