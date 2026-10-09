@@ -1,0 +1,1178 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+    font-family: 'Poppins', sans-serif;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background: #eef8ee;
+}
+
+
+/* ==============================
+   HEADER
+============================== */
+
+header {
+
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 20px 50px;
+
+    background: #1b5e20;
+
+    color: white;
+
+    position: fixed;
+
+    width: 100%;
+
+    top: 0;
+
+    z-index: 1000;
+}
+
+
+.logo {
+
+    font-size: 28px;
+
+    font-weight: bold;
+}
+
+
+nav a {
+
+    text-decoration: none;
+
+    color: white;
+
+    margin-left: 25px;
+
+    font-weight: 500;
+
+    transition: 0.3s;
+}
+
+
+nav a:hover {
+
+    color: #ffeb3b;
+}
+
+
+/* ==============================
+   HERO
+============================== */
+
+.hero {
+
+    height: 100vh;
+
+    background:
+    url("https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=1600&q=80")
+    center center / cover no-repeat;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+}
+
+
+.overlay {
+
+    width: 70%;
+
+    padding: 50px;
+
+    background: rgba(0,0,0,0.55);
+
+    border-radius: 20px;
+
+    text-align: center;
+
+    color: white;
+}
+
+
+.overlay h1 {
+
+    font-size: 50px;
+
+    margin-bottom: 20px;
+}
+
+
+.overlay p {
+
+    font-size: 20px;
+
+    line-height: 35px;
+}
+
+
+.hero-buttons {
+
+    margin-top: 40px;
+}
+
+
+button {
+
+    font-family: inherit;
+
+    cursor: pointer;
+
+    border: none;
+
+    transition: 0.3s;
+}
+
+
+.hero-buttons button {
+
+    padding: 15px 35px;
+
+    margin: 10px;
+
+    font-size: 18px;
+
+    border-radius: 40px;
+
+    color: white;
+}
+
+
+#uploadBtn {
+
+    background: #4caf50;
+}
+
+
+#cameraBtn {
+
+    background: #ff9800;
+}
+
+
+button:hover {
+
+    transform: scale(1.04);
+}
+
+
+/* ==============================
+   FEATURES
+============================== */
+
+.features {
+
+    display: grid;
+
+    grid-template-columns:
+    repeat(auto-fit, minmax(230px, 1fr));
+
+    gap: 30px;
+
+    padding: 80px;
+}
+
+
+.feature-card {
+
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 20px;
+
+    text-align: center;
+
+    box-shadow:
+    0 5px 20px rgba(0,0,0,0.15);
+
+    transition: 0.3s;
+}
+
+
+.feature-card:hover {
+
+    transform: translateY(-8px);
+}
+
+
+.feature-card i {
+
+    font-size: 55px;
+
+    color: green;
+
+    margin-bottom: 20px;
+}
+
+
+.feature-card h3 {
+
+    margin-bottom: 10px;
+}
+
+
+/* ==============================
+   COMMON SECTION
+============================== */
+
+.section-description {
+
+    color: #555;
+
+    margin-top: 10px;
+
+    margin-bottom: 35px;
+}
+
+
+/* ==============================
+   UPLOAD SECTION
+============================== */
+
+.upload-section {
+
+    padding: 90px 20px;
+
+    text-align: center;
+
+    background: #f4fff4;
+}
+
+
+.upload-section h2 {
+
+    color: #1b5e20;
+
+    font-size: 36px;
+}
+
+
+/* Upload box */
+
+.upload-box {
+
+    max-width: 600px;
+
+    margin: auto;
+
+    padding: 50px 30px;
+
+    background: white;
+
+    border: 3px dashed #4caf50;
+
+    border-radius: 20px;
+
+    box-shadow:
+    0 5px 20px rgba(0,0,0,0.1);
+}
+
+
+.upload-box i {
+
+    font-size: 70px;
+
+    color: #4caf50;
+
+    margin-bottom: 20px;
+}
+
+
+.upload-box h3 {
+
+    margin-bottom: 10px;
+}
+
+
+.upload-box p {
+
+    color: #777;
+
+    margin-bottom: 20px;
+}
+
+
+#chooseImageBtn {
+
+    padding: 14px 30px;
+
+    background: #2e7d32;
+
+    color: white;
+
+    border-radius: 30px;
+
+    font-size: 16px;
+}
+
+
+/* ==============================
+   IMAGE PREVIEW
+============================== */
+
+.preview-container {
+
+    display: none;
+
+    max-width: 650px;
+
+    margin: 40px auto 0;
+
+    padding: 30px;
+
+    background: white;
+
+    border-radius: 20px;
+
+    box-shadow:
+    0 5px 25px rgba(0,0,0,0.15);
+}
+
+
+.preview-container h3 {
+
+    color: #1b5e20;
+
+    margin-bottom: 20px;
+}
+
+
+#imagePreview {
+
+    width: 100%;
+
+    max-height: 400px;
+
+    object-fit: contain;
+
+    border-radius: 15px;
+}
+
+
+#fileName {
+
+    margin: 15px 0;
+
+    color: #555;
+}
+
+
+.preview-buttons {
+
+    display: flex;
+
+    justify-content: center;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+    margin-top: 20px;
+}
+
+
+.preview-buttons button {
+
+    padding: 13px 22px;
+
+    border-radius: 25px;
+
+    font-size: 15px;
+}
+
+
+#changeImageBtn {
+
+    background: #2196f3;
+
+    color: white;
+}
+
+
+#removeImageBtn {
+
+    background: #e53935;
+
+    color: white;
+}
+
+
+#detectBtn {
+
+    background: #2e7d32;
+
+    color: white;
+}
+
+
+#detectBtn:disabled {
+
+    opacity: 0.6;
+
+    cursor: not-allowed;
+}
+
+
+/* ==============================
+   CAMERA
+============================== */
+
+.camera-section {
+
+    display: none;
+
+    padding: 90px 20px;
+
+    text-align: center;
+
+    background: #eef8ee;
+}
+
+
+.camera-section h2 {
+
+    color: #1b5e20;
+
+    font-size: 36px;
+}
+
+
+.camera-box {
+
+    max-width: 750px;
+
+    margin: auto;
+
+    padding: 30px;
+
+    background: white;
+
+    border-radius: 20px;
+
+    box-shadow:
+    0 5px 25px rgba(0,0,0,0.15);
+}
+
+
+#cameraVideo,
+#capturedImage {
+
+    width: 100%;
+
+    max-height: 450px;
+
+    object-fit: contain;
+
+    border-radius: 15px;
+
+    background: black;
+}
+
+
+#cameraCanvas {
+
+    display: none;
+}
+
+
+#capturedImage {
+
+    display: none;
+}
+
+
+.camera-buttons {
+
+    margin-top: 20px;
+
+    display: flex;
+
+    justify-content: center;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+}
+
+
+.camera-buttons button {
+
+    padding: 14px 22px;
+
+    border-radius: 25px;
+
+    font-size: 15px;
+}
+
+
+#captureBtn {
+
+    background: #ff9800;
+
+    color: white;
+}
+
+
+#retakeBtn {
+
+    background: #2196f3;
+
+    color: white;
+
+    display: none;
+}
+
+
+#cameraDetectBtn {
+
+    background: #2e7d32;
+
+    color: white;
+
+    display: none;
+}
+
+
+#closeCameraBtn {
+
+    background: #e53935;
+
+    color: white;
+}
+
+
+/* ==============================
+   RESULT SECTION
+============================== */
+
+.result-section {
+
+    display: none;
+
+    padding: 80px 20px;
+
+    text-align: center;
+
+    background: #eef8ee;
+}
+
+
+.result-section h2 {
+
+    color: #1b5e20;
+
+    font-size: 34px;
+
+    margin-bottom: 30px;
+}
+
+
+.result-card {
+
+    max-width: 900px;
+
+    margin: auto;
+
+    padding: 35px;
+
+    background: white;
+
+    border-radius: 20px;
+
+    box-shadow:
+    0 5px 20px rgba(0,0,0,0.15);
+}
+
+
+.result-top {
+
+    display: flex;
+
+    justify-content: center;
+
+    flex-wrap: wrap;
+
+    gap: 20px;
+
+    margin-bottom: 30px;
+}
+
+
+.result-item {
+
+    min-width: 210px;
+
+    padding: 20px;
+
+    background: #f1f8e9;
+
+    border-radius: 15px;
+}
+
+
+.result-item h3 {
+
+    color: #2e7d32;
+
+    margin-bottom: 10px;
+}
+
+
+.result-item p {
+
+    font-size: 20px;
+
+    font-weight: bold;
+}
+
+
+.result-info {
+
+    text-align: left;
+
+    padding: 22px;
+
+    margin-top: 20px;
+
+    background: #f5f5f5;
+
+    border-radius: 15px;
+}
+
+
+.result-info h3 {
+
+    color: #1b5e20;
+
+    margin-bottom: 10px;
+}
+
+
+.result-info p {
+
+    line-height: 1.7;
+}
+
+
+.treatment-box {
+
+    background: #e8f5e9;
+}
+
+
+/* ==============================
+   ABOUT
+============================== */
+
+.about-section {
+
+    padding: 70px 20px;
+
+    text-align: center;
+
+    background: white;
+}
+
+
+.about-section h2 {
+
+    color: #1b5e20;
+
+    margin-bottom: 20px;
+}
+
+
+.about-section p {
+
+    max-width: 850px;
+
+    margin: auto;
+
+    line-height: 1.8;
+
+    color: #555;
+}
+
+
+/* ==============================
+   FOOTER
+============================== */
+
+footer {
+
+    background: #1b5e20;
+
+    color: white;
+
+    text-align: center;
+
+    padding: 20px;
+}
+
+
+/* ==============================
+   MOBILE
+============================== */
+
+@media(max-width: 768px) {
+
+    header {
+
+        padding: 15px 20px;
+    }
+
+    nav {
+
+        display: none;
+    }
+
+    .overlay {
+
+        width: 90%;
+
+        padding: 30px;
+    }
+
+    .overlay h1 {
+
+        font-size: 32px;
+    }
+
+    .overlay p {
+
+        font-size: 16px;
+
+        line-height: 26px;
+    }
+
+    .features {
+
+        padding: 40px 20px;
+    }
+
+}
+
+/* =========================================
+   AFFECTED REGION VISUALIZATION
+========================================= */
+
+.detection-visualization {
+
+    margin-top: 30px;
+
+    padding: 25px;
+
+    background: #f8fff8;
+
+    border-radius: 18px;
+}
+
+
+.detection-visualization h3 {
+
+    color: #1b5e20;
+
+    text-align: center;
+
+    margin-bottom: 8px;
+}
+
+
+.visualization-note {
+
+    text-align: center;
+
+    color: #666;
+
+    margin-bottom: 25px;
+}
+
+
+.comparison-images {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 25px;
+}
+
+
+.comparison-card {
+
+    background: white;
+
+    padding: 20px;
+
+    border-radius: 15px;
+
+    box-shadow:
+        0 4px 15px rgba(0,0,0,0.10);
+
+    text-align: center;
+}
+
+
+.comparison-card h4 {
+
+    color: #2e7d32;
+
+    margin-bottom: 15px;
+}
+
+
+.comparison-card img {
+
+    width: 100%;
+
+    height: 300px;
+
+    object-fit: contain;
+
+    border-radius: 12px;
+
+    background: #f4f4f4;
+}
+
+
+.highlight-note {
+
+    margin-top: 12px;
+
+    font-size: 14px;
+
+    color: #666;
+}
+
+
+/* Mobile */
+
+@media(max-width: 700px) {
+
+    .comparison-images {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+/* =========================================
+   TOP 3 AI PREDICTIONS
+========================================= */
+
+.top-predictions-box {
+
+    margin-top: 30px;
+
+    padding: 25px;
+
+    background: #f8fff8;
+
+    border-radius: 18px;
+}
+
+
+.top-predictions-box h3 {
+
+    text-align: center;
+
+    color: #1b5e20;
+
+    margin-bottom: 20px;
+}
+
+
+.prediction-row {
+
+    margin-bottom: 18px;
+}
+
+
+.prediction-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-bottom: 7px;
+
+    font-size: 15px;
+}
+
+
+.prediction-bar {
+
+    width: 100%;
+
+    height: 12px;
+
+    background: #e0e0e0;
+
+    border-radius: 10px;
+
+    overflow: hidden;
+}
+
+
+.prediction-fill {
+
+    height: 100%;
+
+    background: #2e7d32;
+
+    border-radius: 10px;
+
+    transition: width 0.6s ease;
+}
+
+/* =========================================
+   MODEL METRICS
+========================================= */
+
+.evaluation-section {
+
+    padding: 80px 20px;
+
+    background: #f4fff4;
+
+    text-align: center;
+}
+
+
+.evaluation-section h2 {
+
+    color: #1b5e20;
+
+    font-size: 34px;
+
+    margin-bottom: 10px;
+}
+
+
+.evaluation-description {
+
+    color: #666;
+
+    margin-bottom: 35px;
+}
+
+
+.metrics-grid {
+
+    max-width: 1100px;
+
+    margin: auto;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(230px, 1fr)
+        );
+
+    gap: 20px;
+}
+
+
+.metric-card {
+
+    background: white;
+
+    padding: 25px;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 4px 15px rgba(0,0,0,0.10);
+}
+
+
+.metric-card h3 {
+
+    color: #2e7d32;
+
+    margin-bottom: 12px;
+}
+
+
+.metric-card p {
+
+    font-size: 30px;
+
+    font-weight: bold;
+
+    color: #111;
+
+    margin-bottom: 8px;
+}
+
+
+.metric-card span {
+
+    color: #777;
+
+    font-size: 13px;
+}
+
+
+.formula-box {
+
+    max-width: 850px;
+
+    margin: 40px auto 0;
+
+    padding: 25px;
+
+    background: white;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 4px 15px rgba(0,0,0,0.10);
+}
+
+
+.formula-box h3 {
+
+    color: #1b5e20;
+
+    margin-bottom: 20px;
+}
+
+
+.formula-box p {
+
+    margin: 12px;
+
+    font-weight: 500;
+}
+
+/* =========================================
+   AGRICULTURE AI CHATBOT
+========================================= */
+.agri-chatbot{position:fixed;right:22px;bottom:22px;width:355px;height:520px;background:#fff;border-radius:20px;box-shadow:0 10px 35px rgba(0,0,0,.22);z-index:5000;overflow:hidden;display:flex;flex-direction:column;border:1px solid #d8ead8}
+.agri-chat-header{background:#1b5e20;color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+.agri-chat-title{display:flex;align-items:center;gap:10px}.agri-bot-icon{width:38px;height:38px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:21px}.agri-chat-title strong{display:block;font-size:15px}.agri-chat-title small{display:block;color:#c8e6c9;font-size:11px}
+.chat-minimize-btn{background:rgba(255,255,255,.15);color:#fff;width:32px;height:32px;border-radius:50%;font-size:20px}.chat-minimize-btn:hover{background:rgba(255,255,255,.28)}
+.chat-messages{flex:1;overflow-y:auto;padding:15px;background:#f4fff4}.chat-message{display:flex;align-items:flex-start;gap:8px;margin-bottom:13px}.chat-message.user{justify-content:flex-end}.chat-avatar{width:30px;height:30px;min-width:30px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:16px}.chat-bubble{max-width:78%;padding:10px 12px;border-radius:14px;background:#fff;color:#333;font-size:13px;line-height:1.5;box-shadow:0 2px 8px rgba(0,0,0,.08)}.chat-message.user .chat-bubble{background:#2e7d32;color:#fff;border-bottom-right-radius:4px}
+.chat-quick-buttons{padding:8px 10px;display:flex;gap:6px;flex-wrap:wrap;background:#fff;border-top:1px solid #e6e6e6}.chat-quick-btn{background:#e8f5e9;color:#1b5e20;border:1px solid #c8e6c9;padding:6px 9px;border-radius:15px;font-size:11px}.chat-quick-btn:hover{background:#c8e6c9;transform:none}
+.chat-input-area{display:flex;gap:7px;padding:10px;background:#fff;border-top:1px solid #e6e6e6}#chatInput{flex:1;min-width:0;border:1px solid #c8e6c9;border-radius:22px;padding:10px 13px;outline:none;font-family:inherit;font-size:13px}#chatInput:focus{border-color:#2e7d32}#chatSendBtn{width:40px;height:40px;border-radius:50%;background:#2e7d32;color:#fff;font-size:18px}#chatSendBtn:hover{background:#1b5e20;transform:scale(1.04)}
+.chat-disclaimer{padding:6px 12px 9px;background:#fff;color:#777;font-size:9px;text-align:center;line-height:1.35}.chat-open-btn{position:fixed;right:22px;bottom:22px;width:58px;height:58px;border-radius:50%;background:#1b5e20;color:#fff;font-size:25px;box-shadow:0 6px 20px rgba(0,0,0,.25);z-index:4999;display:none}.agri-chatbot.minimized{display:none}
+@media(max-width:768px){.agri-chatbot{right:10px;bottom:10px;width:calc(100vw - 20px);height:500px}.chat-open-btn{right:15px;bottom:15px}}
+/* =========================================
+   LANGUAGE SELECTOR
+========================================= */
+
+.language-selector {
+    position: relative;
+    display: inline-block;
+    margin-left: 15px;
+}
+
+.language-button {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    color: white;
+    padding: 9px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: inherit;
+    transition: 0.3s ease;
+}
+
+.language-button:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+}
+
+.language-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+
+    width: 190px;
+    max-height: 400px;
+    overflow-y: auto;
+
+    background: white;
+    border-radius: 12px;
+    padding: 7px;
+
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18);
+
+    display: none;
+
+    z-index: 9999;
+}
+
+.language-menu.show {
+    display: block;
+}
+
+.language-menu button {
+    width: 100%;
+
+    background: transparent;
+    border: none;
+
+    padding: 10px 12px;
+
+    text-align: left;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+    color: #333;
+
+    transition: 0.2s ease;
+}
+
+.language-menu button:hover {
+    background: #f0f7f1;
+    color: #2e7d32;
+}
+
+
+/* Mobile */
+
+@media (max-width: 768px) {
+
+    .language-selector {
+        margin-left: 5px;
+        margin-top: 10px;
+    }
+
+    .language-button {
+        font-size: 13px;
+        padding: 8px 10px;
+    }
+
+    .language-menu {
+        right: 0;
+        width: 175px;
+    }
+
+}

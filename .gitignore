@@ -1,0 +1,7 @@
+backend/.venv/
+.venv/
+__pycache__/
+*.pyc
+backend/uploads/
+dataset/
+split_dataset/

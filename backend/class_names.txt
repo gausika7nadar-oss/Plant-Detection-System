@@ -1,0 +1,33 @@
+Banana_healthy
+Banana_lateblight
+Cotton_Heathy
+Cotton_late blight
+Gram_disease
+Gram_healthy
+Jowar_disease
+Jowar_healthy
+Maize_disease
+Maize_healthy
+Onion_disease
+Onion_healthy
+Other
+Potato___Early_blight
+Potato___Late_blight
+Potato___healthy
+Rice_disease
+Rice_healthy
+Sorghum Disease Image Dataset
+Soyabean_disease
+Soyabean_healthy
+Strawberry_disease
+Strawberry_healthy
+Sugarcane_disease
+Sugarcane_healthy
+Sunflower_disease
+Sunflower_healthy
+Tomato___Early_blight
+Tomato___Late_blight
+Tomato___healthy
+Wheat_disease
+Wheat_healthy
+images
