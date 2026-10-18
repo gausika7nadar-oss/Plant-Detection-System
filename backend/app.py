@@ -1,107 +1,336 @@
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from PIL import Image, ImageOps, UnidentifiedImageError
-from io import BytesIO
+
+import tensorflow as tf
 import numpy as np
 import cv2
 import base64
+import os
+import json
+from PIL import Image
+from io import BytesIO
 
 app = Flask(__name__)
 CORS(app)
-app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
+
+BASE_DIR = os.path.dirname(
+    os.path.abspath(__file__)
+)
+
+MODEL_PATH = os.path.join(
+    BASE_DIR,
+    "plant_disease_model.keras"
+)
+
+CLASS_FILE = os.path.join(
+    BASE_DIR,
+    "class_names.txt"
+)
+
+METRICS_FILE = os.path.join(
+    BASE_DIR,
+    "model_metrics.json"
+)
 
 
-# Convert an RGB image to a Base64 image URL
-def image_to_base64(rgb):
-    bgr = cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
 
-    success, buffer = cv2.imencode(".jpg", bgr)
+print("Loading Plant Disease AI Model...")
 
-    if not success:
-        raise ValueError("Image encoding failed")
+model = tf.keras.models.load_model(
+    MODEL_PATH
+)
 
-    encoded = base64.b64encode(buffer.tobytes()).decode("utf-8")
-
-    return "data:image/jpeg;base64," + encoded
+print("AI Model Loaded Successfully!")
 
 
-# Analyze visible leaf discoloration using OpenCV
-def analyze_leaf(rgb):
-    hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
+# =========================================================
+# LOAD CLASS NAMES
+# =========================================================
 
-    # Estimate the leaf region from its colors.
-    # Works best with one leaf and a plain background.
-    candidate = cv2.inRange(
-        hsv,
-        np.array([5, 35, 25]),
-        np.array([100, 255, 255])
+with open(
+    CLASS_FILE,
+    "r"
+) as file:
+
+    class_names = [
+        line.strip()
+        for line in file.readlines()
+        if line.strip()
+    ]
+
+
+print("\nClasses loaded:")
+
+for class_name in class_names:
+    print(class_name)
+
+
+# =========================================================
+# DISEASE INFORMATION
+# =========================================================
+
+disease_information = {
+
+    "Tomato___Early_blight": {
+
+        "plant": "Tomato",
+
+        "disease": "Early Blight",
+
+        "information":
+        "Early blight is a fungal disease that causes dark or brown spots on tomato leaves.",
+
+        "treatment":
+        "Remove infected leaves, avoid excess moisture on the leaves and use an appropriate fungicide when required."
+    },
+
+
+    "Tomato___Late_blight": {
+
+        "plant": "Tomato",
+
+        "disease": "Late Blight",
+
+        "information":
+        "Late blight can rapidly affect tomato leaves, stems and fruits.",
+
+        "treatment":
+        "Remove infected plant material, improve air circulation and use suitable disease-control treatment."
+    },
+
+
+    "Tomato___healthy": {
+
+        "plant": "Tomato",
+
+        "disease": "Healthy",
+
+        "information":
+        "The tomato leaf appears healthy.",
+
+        "treatment":
+        "Continue normal watering, nutrition and regular plant monitoring."
+    },
+
+
+    "Potato___Early_blight": {
+
+        "plant": "Potato",
+
+        "disease": "Early Blight",
+
+        "information":
+        "Early blight commonly causes dark or brown spots on potato leaves.",
+
+        "treatment":
+        "Remove infected foliage, maintain proper spacing and use an appropriate fungicide if necessary."
+    },
+
+
+    "Potato___Late_blight": {
+
+        "plant": "Potato",
+
+        "disease": "Late Blight",
+
+        "information":
+        "Late blight can quickly damage potato leaves and stems.",
+
+        "treatment":
+        "Remove infected plant material, reduce excess leaf moisture and use appropriate disease-control measures."
+    },
+
+
+    "Potato___healthy": {
+
+        "plant": "Potato",
+
+        "disease": "Healthy",
+
+        "information":
+        "The potato leaf appears healthy.",
+
+        "treatment":
+        "Continue proper watering, nutrition and regular crop monitoring."
+    }
+}
+
+
+# =========================================================
+# CONVERT PIL IMAGE TO BASE64
+# =========================================================
+
+def pil_to_base64(pil_image):
+
+    buffer = BytesIO()
+
+    pil_image.convert("RGB").save(
+        buffer,
+        format="JPEG",
+        quality=90
     )
 
-    count, labels, stats, _ = cv2.connectedComponentsWithStats(
-        candidate
+    encoded_image = base64.b64encode(
+        buffer.getvalue()
+    ).decode("utf-8")
+
+    return (
+        "data:image/jpeg;base64,"
+        + encoded_image
     )
 
-    leaf_mask = np.zeros(candidate.shape, dtype=np.uint8)
 
-    if count > 1:
-        areas = stats[1:, cv2.CC_STAT_AREA]
-        largest = 1 + int(np.argmax(areas))
+# =========================================================
+# MAKE CLASS NAME READABLE
+# =========================================================
 
-        if areas.max() >= 0.025 * candidate.size:
-            leaf_mask[labels == largest] = 255
+def make_readable_class_name(class_name):
 
-            kernel = np.ones((7, 7), np.uint8)
+    if "___" in class_name:
 
-            leaf_mask = cv2.morphologyEx(
-                leaf_mask,
-                cv2.MORPH_CLOSE,
-                kernel,
-                iterations=2
+        plant_part, disease_part = class_name.split(
+            "___",
+            1
+        )
+
+        plant_part = plant_part.replace(
+            "_",
+            " "
+        )
+
+        disease_part = disease_part.replace(
+            "_",
+            " "
+        )
+
+        return (
+            plant_part
+            + " - "
+            + disease_part
+        )
+
+    return class_name.replace(
+        "_",
+        " "
+    )
+
+
+# =========================================================
+# SEVERITY + AFFECTED AREA VISUALIZATION
+# =========================================================
+
+def estimate_severity(
+    pil_image,
+    disease_name
+):
+
+    # Convert image to RGB array
+    rgb_image = np.array(
+        pil_image.convert("RGB")
+    )
+
+
+    # -----------------------------------------------------
+    # HEALTHY LEAF
+    # -----------------------------------------------------
+
+    if disease_name.lower() == "healthy":
+
+        highlighted_bgr = cv2.cvtColor(
+            rgb_image,
+            cv2.COLOR_RGB2BGR
+        )
+
+        success, buffer = cv2.imencode(
+            ".jpg",
+            highlighted_bgr
+        )
+
+        highlighted_base64 = ""
+
+        if success:
+
+            highlighted_base64 = (
+                "data:image/jpeg;base64,"
+                + base64.b64encode(
+                    buffer
+                ).decode("utf-8")
             )
 
-    total_leaf_pixels = cv2.countNonZero(leaf_mask)
+        return {
 
-    if total_leaf_pixels < 0.025 * leaf_mask.size:
-        return None
+            "severity": "Healthy",
 
-    # Identify yellow regions
-    yellow_mask = cv2.inRange(
-        hsv,
-        np.array([18, 35, 45]),
-        np.array([36, 255, 255])
+            "affected_percentage": 0.0,
+
+            "highlighted_image":
+            highlighted_base64
+        }
+
+
+    # -----------------------------------------------------
+    # CONVERT IMAGE TO HSV
+    # -----------------------------------------------------
+
+    hsv_image = cv2.cvtColor(
+        rgb_image,
+        cv2.COLOR_RGB2HSV
     )
 
-    # Identify brown regions
-    brown_mask = cv2.inRange(
-        hsv,
-        np.array([5, 45, 20]),
-        np.array([19, 255, 200])
+
+    # -----------------------------------------------------
+    # LEAF MASK
+    # -----------------------------------------------------
+
+    leaf_lower = np.array(
+        [5, 25, 20]
     )
 
-    # Identify dark regions
-    dark_mask = cv2.inRange(
-        hsv,
-        np.array([0, 30, 10]),
-        np.array([179, 255, 75])
+    leaf_upper = np.array(
+        [100, 255, 255]
     )
 
-    damaged_mask = cv2.bitwise_or(
-        yellow_mask,
-        brown_mask
+    leaf_mask = cv2.inRange(
+        hsv_image,
+        leaf_lower,
+        leaf_upper
     )
 
-    damaged_mask = cv2.bitwise_or(
-        damaged_mask,
-        dark_mask
+
+    # -----------------------------------------------------
+    # POSSIBLE DAMAGED AREA
+    # -----------------------------------------------------
+
+    damaged_lower = np.array(
+        [5, 40, 30]
     )
 
+    damaged_upper = np.array(
+        [35, 255, 230]
+    )
+
+    damaged_mask = cv2.inRange(
+        hsv_image,
+        damaged_lower,
+        damaged_upper
+    )
+
+
+    # Keep damaged pixels only inside leaf
     damaged_mask = cv2.bitwise_and(
         damaged_mask,
         leaf_mask
     )
 
-    kernel = np.ones((3, 3), np.uint8)
+
+    # -----------------------------------------------------
+    # CLEAN THE MASK
+    # -----------------------------------------------------
+
+    kernel = np.ones(
+        (3, 3),
+        np.uint8
+    )
 
     damaged_mask = cv2.morphologyEx(
         damaged_mask,
@@ -109,279 +338,718 @@ def analyze_leaf(rgb):
         kernel
     )
 
-    # Remove very small isolated regions
-    count, labels, stats, _ = cv2.connectedComponentsWithStats(
+    damaged_mask = cv2.morphologyEx(
+        damaged_mask,
+        cv2.MORPH_CLOSE,
+        kernel
+    )
+
+
+    # -----------------------------------------------------
+    # COUNT PIXELS
+    # -----------------------------------------------------
+
+    total_leaf_pixels = cv2.countNonZero(
+        leaf_mask
+    )
+
+    damaged_pixels = cv2.countNonZero(
         damaged_mask
     )
 
-    cleaned_mask = np.zeros_like(damaged_mask)
 
-    minimum_area = max(
-        12,
-        int(total_leaf_pixels * 0.0003)
-    )
+    # -----------------------------------------------------
+    # CALCULATE AFFECTED PERCENTAGE
+    # -----------------------------------------------------
 
-    for index in range(1, count):
-        area = stats[index, cv2.CC_STAT_AREA]
+    if total_leaf_pixels == 0:
 
-        if area >= minimum_area:
-            cleaned_mask[labels == index] = 255
+        affected_percentage = 0.0
 
-    affected_pixels = cv2.countNonZero(cleaned_mask)
-
-    affected_percentage = round(
-        (affected_pixels / total_leaf_pixels) * 100,
-        2
-    )
-
-    # Rule-based symptom descriptions
-    if affected_percentage < 3:
-        severity = "Low visible discoloration"
-        disease = "No prominent discoloration detected"
-
-        information = (
-            "No prominent yellow, brown, or dark regions were "
-            "detected. This does not guarantee the plant is healthy."
-        )
-
-        treatment = (
-            "Continue regular monitoring, suitable watering, "
-            "and proper plant care."
-        )
-
-    elif affected_percentage < 15:
-        severity = "Mild visible discoloration"
-        disease = "Possible leaf discoloration"
-
-        information = (
-            "Some yellow, brown, or dark regions are visible. "
-            "These may result from several environmental or "
-            "biological causes."
-        )
-
-        treatment = (
-            "Check watering, nutrients, and both sides of the leaf. "
-            "Monitor whether the affected areas spread."
-        )
-
-    elif affected_percentage < 35:
-        severity = "Moderate visible discoloration"
-        disease = "Noticeable leaf discoloration"
-
-        information = (
-            "Noticeable discolored regions were detected. "
-            "Image colors alone cannot determine the exact cause."
-        )
-
-        treatment = (
-            "Inspect nearby plants, check soil moisture, "
-            "improve airflow, and seek agricultural guidance "
-            "if symptoms continue."
-        )
+        severity = "Unable to estimate"
 
     else:
-        severity = "Extensive visible discoloration"
-        disease = "Extensive leaf discoloration"
 
-        information = (
-            "A large proportion of the estimated leaf region "
-            "contains yellow, brown, or dark colors. "
-            "This is not a confirmed disease diagnosis."
+        affected_percentage = (
+            damaged_pixels
+            /
+            total_leaf_pixels
+        ) * 100
+
+        affected_percentage = round(
+            affected_percentage,
+            2
         )
 
-        treatment = (
-            "Consider an in-person agricultural assessment "
-            "before selecting a treatment."
-        )
 
-    # Create highlighted image
-    highlighted = rgb.copy()
+        # -------------------------------------------------
+        # SEVERITY LEVEL
+        # -------------------------------------------------
 
-    affected_region = cleaned_mask > 0
+        if affected_percentage < 10:
 
-    red = np.array([255, 0, 0], dtype=np.float32)
+            severity = "Very Mild"
 
-    highlighted[affected_region] = (
-        0.45 * highlighted[affected_region]
-        + 0.55 * red
-    ).astype(np.uint8)
+        elif affected_percentage < 25:
+
+            severity = "Mild"
+
+        elif affected_percentage < 50:
+
+            severity = "Moderate"
+
+        else:
+
+            severity = "Severe"
+
+
+    # -----------------------------------------------------
+    # CREATE RED HIGHLIGHT
+    # -----------------------------------------------------
+
+    highlighted = rgb_image.copy()
+
+    red_overlay = np.zeros_like(
+        highlighted
+    )
+
+    # RGB red
+    red_overlay[:, :, 0] = 255
+
+
+    affected_pixels = (
+        damaged_mask > 0
+    )
+
+
+    highlighted[
+        affected_pixels
+    ] = (
+
+        0.45
+        * highlighted[
+            affected_pixels
+        ]
+
+        +
+
+        0.55
+        * red_overlay[
+            affected_pixels
+        ]
+
+    ).astype(
+        np.uint8
+    )
+
+
+    # -----------------------------------------------------
+    # DRAW RED OUTLINES
+    # -----------------------------------------------------
 
     contours, _ = cv2.findContours(
-        cleaned_mask,
+        damaged_mask,
         cv2.RETR_EXTERNAL,
         cv2.CHAIN_APPROX_SIMPLE
     )
 
-    cv2.drawContours(
+
+    highlighted_bgr = cv2.cvtColor(
         highlighted,
+        cv2.COLOR_RGB2BGR
+    )
+
+
+    cv2.drawContours(
+        highlighted_bgr,
         contours,
         -1,
-        (255, 0, 0),
+        (0, 0, 255),
         2
     )
 
-    return {
-        "success": True,
-        "plant": "Unknown (not identified)",
-        "disease": disease,
-        "confidence": None,
-        "severity": severity,
-        "affected_percentage": affected_percentage,
-        "information": information,
-        "treatment": treatment,
-        "original_image": image_to_base64(rgb),
-        "highlighted_image": image_to_base64(highlighted),
-        "analysis_method": "OpenCV rule-based image processing",
-        "top_predictions": [],
-        "message": (
-            "Results describe visible color abnormalities, "
-            "not a confirmed plant disease."
+
+    # -----------------------------------------------------
+    # CONVERT HIGHLIGHTED IMAGE TO BASE64
+    # -----------------------------------------------------
+
+    success, buffer = cv2.imencode(
+        ".jpg",
+        highlighted_bgr
+    )
+
+    highlighted_base64 = ""
+
+    if success:
+
+        highlighted_base64 = (
+            "data:image/jpeg;base64,"
+            + base64.b64encode(
+                buffer
+            ).decode("utf-8")
         )
+
+
+    return {
+
+        "severity":
+        severity,
+
+        "affected_percentage":
+        affected_percentage,
+
+        "highlighted_image":
+        highlighted_base64
     }
 
 
-@app.route("/", methods=["GET"])
+# =========================================================
+# HOME ROUTE
+# =========================================================
+
+@app.route("/")
 def home():
+
     return jsonify({
-        "success": True,
-        "message": "PlantCare OpenCV backend is running",
-        "method": "Digital image processing"
+
+        "status": "success",
+
+        "message":
+        "PlantCare AI Backend is Running"
     })
 
 
-@app.route("/upload", methods=["POST"])
-def upload_image():
-    uploaded_file = request.files.get("image")
+# =========================================================
+# UPLOAD + AI PREDICTION ROUTE
+# =========================================================
 
-    if uploaded_file is None or uploaded_file.filename == "":
+@app.route(
+    "/upload",
+    methods=["POST"]
+)
+def upload_image():
+
+    # -----------------------------------------------------
+    # CHECK IMAGE
+    # -----------------------------------------------------
+
+    if "image" not in request.files:
+
         return jsonify({
+
             "success": False,
-            "message": "Please select a leaf image."
+
+            "message":
+            "No image received"
+
         }), 400
+
+
+    uploaded_image = request.files[
+        "image"
+    ]
+
+
+    if uploaded_image.filename == "":
+
+        return jsonify({
+
+            "success": False,
+
+            "message":
+            "No image selected"
+
+        }), 400
+
+
+    print(
+        "\nImage received:",
+        uploaded_image.filename
+    )
+
 
     try:
-        image_bytes = uploaded_file.read()
 
-        image = Image.open(BytesIO(image_bytes))
-        image = ImageOps.exif_transpose(image)
-        image = image.convert("RGB")
+        # =================================================
+        # READ IMAGE
+        # =================================================
 
-        image.thumbnail((900, 900))
+        image_bytes = uploaded_image.read()
 
-        rgb = np.array(image, dtype=np.uint8)
+        img = Image.open(
+            BytesIO(image_bytes)
+        )
 
-        result = analyze_leaf(rgb)
+        img = img.convert(
+            "RGB"
+        )
 
-        if result is None:
-            return jsonify({
-                "success": False,
-                "invalid_image": True,
-                "message": (
-                    "Could not isolate a suitable leaf region. "
-                    "Try one leaf against a plain contrasting "
-                    "background with even lighting."
+
+        # Original image for frontend
+        original_image_base64 = pil_to_base64(
+            img
+        )
+
+
+        # =================================================
+        # PREPARE IMAGE FOR MODEL
+        # =================================================
+
+        model_image = img.resize(
+            (224, 224)
+        )
+
+        img_array = np.array(
+            model_image,
+            dtype=np.float32
+        )
+
+        img_array = np.expand_dims(
+            img_array,
+            axis=0
+        )
+
+
+        # =================================================
+        # AI PREDICTION
+        # =================================================
+
+        predictions = model.predict(
+            img_array
+        )
+
+
+        prediction_scores = predictions[0]
+
+
+        # =================================================
+        # TOP 3 AI PREDICTIONS
+        # =================================================
+
+        top_indices = np.argsort(
+            prediction_scores
+        )[-3:][::-1]
+
+
+        top_predictions = []
+
+
+        for index in top_indices:
+
+            class_name = class_names[
+                index
+            ]
+
+            score = float(
+                prediction_scores[index]
+                * 100
+            )
+
+            readable_name = (
+                make_readable_class_name(
+                    class_name
                 )
+            )
+
+            top_predictions.append({
+
+                "name":
+                readable_name,
+
+                "confidence":
+                round(
+                    score,
+                    2
+                )
+            })
+
+
+        # Print Top 3 in terminal
+        print("\nTop 3 Predictions:")
+
+        for prediction in top_predictions:
+
+            print(
+                prediction["name"],
+                "-",
+                prediction["confidence"],
+                "%"
+            )
+
+
+        # =================================================
+        # MAIN PREDICTION
+        # =================================================
+
+        predicted_index = int(
+            np.argmax(
+                prediction_scores
+            )
+        )
+
+
+        confidence = float(
+            prediction_scores[
+                predicted_index
+            ]
+            * 100
+        )
+
+
+        predicted_class = class_names[
+            predicted_index
+        ]
+
+
+        print(
+            "\nPrediction:",
+            predicted_class
+        )
+
+
+        print(
+            "AI Confidence:",
+            round(
+                confidence,
+                2
+            ),
+            "%"
+        )
+
+
+        # =================================================
+        # REJECT OTHER
+        # =================================================
+
+        if predicted_class == "Other":
+
+            return jsonify({
+
+                "success": False,
+
+                "invalid_image": True,
+
+                "message":
+                "This does not appear to be a supported tomato or potato leaf."
+
             }), 400
 
-        return jsonify(result)
 
-    except (UnidentifiedImageError, OSError, ValueError):
+        # =================================================
+        # GET DISEASE DETAILS
+        # =================================================
+
+        details = disease_information.get(
+            predicted_class
+        )
+
+
+        # Fallback for future plant classes
+        if details is None:
+
+            if "___" in predicted_class:
+
+                plant_name, disease_name = (
+                    predicted_class.split(
+                        "___",
+                        1
+                    )
+                )
+
+                plant_name = (
+                    plant_name.replace(
+                        "_",
+                        " "
+                    )
+                )
+
+                disease_name = (
+                    disease_name.replace(
+                        "_",
+                        " "
+                    )
+                )
+
+            else:
+
+                plant_name = (
+                    predicted_class.replace(
+                        "_",
+                        " "
+                    )
+                )
+
+                disease_name = (
+                    "Unknown"
+                )
+
+
+            details = {
+
+                "plant":
+                plant_name,
+
+                "disease":
+                disease_name,
+
+                "information":
+                "Plant condition detected.",
+
+                "treatment":
+                "Consult an agricultural expert for detailed treatment advice."
+            }
+
+
+        # =================================================
+        # SEVERITY ANALYSIS
+        # =================================================
+
+        severity_result = estimate_severity(
+            img,
+            details["disease"]
+        )
+
+
+        print(
+            "Severity:",
+            severity_result[
+                "severity"
+            ]
+        )
+
+
+        print(
+            "Estimated affected area:",
+            severity_result[
+                "affected_percentage"
+            ],
+            "%"
+        )
+
+
+        # =================================================
+        # SEND EVERYTHING TO FRONTEND
+        # =================================================
+
         return jsonify({
-            "success": False,
-            "message": "Please upload a valid JPG or PNG image."
-        }), 400
+
+            "success":
+            True,
 
 
-@app.route("/chat", methods=["POST"])
-def chat():
-    data = request.get_json(silent=True) or {}
+            "plant":
+            details["plant"],
 
-    message = str(data.get("message", "")).strip()
 
-    if not message:
+            "disease":
+            details["disease"],
+
+
+            "confidence":
+            round(
+                confidence,
+                2
+            ),
+
+
+            "top_predictions":
+            top_predictions,
+
+
+            "severity":
+            severity_result[
+                "severity"
+            ],
+
+
+            "affected_percentage":
+            severity_result[
+                "affected_percentage"
+            ],
+
+
+            "original_image":
+            original_image_base64,
+
+
+            "highlighted_image":
+            severity_result[
+                "highlighted_image"
+            ],
+
+
+            "information":
+            details["information"],
+
+
+            "treatment":
+            details["treatment"]
+
+        })
+
+
+    # =====================================================
+    # ERROR HANDLING
+    # =====================================================
+
+    except Exception as error:
+
+        print(
+            "Prediction Error:",
+            error
+        )
+
         return jsonify({
+
             "success": False,
-            "message": "Please enter a question."
-        }), 400
 
-    question = message.lower()
+            "message":
+            str(error)
 
-    if "yellow" in question:
-        reply = (
-            "Yellow leaves may be caused by nutrient issues, "
-            "watering problems, natural aging, or disease. "
-            "Check the plant's growing conditions."
-        )
+        }), 500
 
-    elif "brown" in question or "spot" in question:
-        reply = (
-            "Brown spots can have several causes. Check leaf "
-            "moisture, spot patterns, and the surrounding plants. "
-            "A local agricultural expert can help identify the cause."
-        )
 
-    elif "water" in question or "irrigation" in question:
-        reply = (
-            "Water requirements depend on crop, soil, and weather. "
-            "Check soil moisture and avoid waterlogging."
-        )
 
-    elif "fertilizer" in question or "nutrient" in question:
-        reply = (
-            "Use suitable nutrients based on crop requirements "
-            "and soil conditions. A soil test can help."
-        )
-
-    elif "treatment" in question or "fungicide" in question:
-        reply = (
-            "Treatment depends on the actual cause. "
-            "Do not select chemicals based only on leaf color. "
-            "Seek appropriate agricultural advice."
-        )
-
-    elif "healthy" in question or "prevent" in question:
-        reply = (
-            "Regular inspection, suitable watering, good airflow, "
-            "and balanced nutrition support plant health."
-        )
-
-    else:
-        reply = (
-            "PlantCare can help with leaf discoloration, "
-            "watering, crop care, and general prevention. "
-            "It does not provide confirmed disease diagnoses."
-        )
-
-    return jsonify({
-        "success": True,
-        "reply": reply
-    })
-
+# =========================================================
+# MODEL METRICS API
+# =========================================================
 
 @app.route("/model-metrics", methods=["GET"])
 def model_metrics():
-    return jsonify({
-        "success": False,
-        "message": (
-            "No machine-learning model is used. "
-            "Model accuracy and precision are not applicable."
+
+    try:
+
+        with open(
+            METRICS_FILE,
+            "r"
+        ) as file:
+
+            metrics = json.load(file)
+
+        return jsonify({
+            "success": True,
+            "metrics": metrics
+        })
+
+    except Exception as error:
+
+        print(
+            "Model Metrics Error:",
+            error
         )
-    })
+
+        return jsonify({
+            "success": False,
+            "message": str(error)
+        }), 500
 
 
-@app.errorhandler(413)
-def file_too_large(error):
-    return jsonify({
-        "success": False,
-        "message": "The uploaded image exceeds 10 MB."
-    }), 413
 
+# =========================================================
+# AGRICULTURE AI CHATBOT
+# =========================================================
+
+def agriculture_chat_response(message):
+    text = message.lower().strip()
+
+    if (text == "hi" or text == "hello" or text == "hey"
+            or text.startswith("hi ") or text.startswith("hello ")
+            or text.startswith("hey ")):
+        return ("Hello! 🌱 I am your Agriculture AI Assistant. "
+                "You can ask me about crop diseases, symptoms, "
+                "prevention, treatment and general plant health.")
+
+    if "early blight" in text:
+        return ("Early blight commonly causes dark or brown spots on crop leaves. "
+                "Remove severely infected leaves, improve air circulation, avoid "
+                "unnecessary leaf wetness and follow appropriate disease-control guidance.")
+
+    if "late blight" in text:
+        return ("Late blight can spread quickly under favorable cool and humid conditions. "
+                "Monitor leaves carefully, remove severely affected plant material "
+                "and follow appropriate disease-control guidance.")
+
+    if "tomato" in text:
+        return ("For tomato crops, common diseases in this project include Early Blight "
+                "and Late Blight. Upload a clear tomato leaf image to the detector "
+                "for an AI-based prediction.")
+
+    if "potato" in text:
+        return ("For potato crops, common diseases in this project include Early Blight "
+                "and Late Blight. Maintain good spacing, monitor leaves regularly "
+                "and upload a clear image for an AI-based prediction.")
+
+    if "maize" in text or "corn" in text:
+        return ("Maize can develop different leaf diseases that may cause spots, "
+                "discoloration or leaf damage. Regular monitoring and good crop "
+                "management are useful. Upload a clear leaf image for a prediction.")
+
+    if "rice" in text:
+        return ("Rice can be affected by several fungal and bacterial diseases. "
+                "Monitor leaves regularly and maintain good crop management. "
+                "Upload a clear rice leaf image for a specific prediction.")
+
+    if "soybean" in text or "soyabean" in text:
+        return ("Soybean diseases can cause leaf spots, yellowing or other visible damage. "
+                "Regular monitoring and good field management can help identify problems early.")
+
+    if "prevent" in text or "prevention" in text:
+        return ("General crop-disease prevention includes healthy planting material, "
+                "proper spacing, regular crop monitoring, removing severely affected "
+                "plant material and avoiding unnecessary pesticide use.")
+
+    if "treatment" in text or "medicine" in text or "cure" in text:
+        return ("Treatment depends on the crop and confirmed disease. Use the detector "
+                "as a prediction aid, but confirm important chemical-treatment decisions "
+                "with a qualified agricultural expert and follow the product label.")
+
+    if "healthy" in text:
+        return ("A healthy-looking leaf usually has normal color and no obvious disease "
+                "symptoms. Visual appearance alone cannot guarantee that a crop is "
+                "disease-free. You can upload an image for an AI-based prediction.")
+
+    if "confidence" in text:
+        return ("AI confidence is the model's score for its predicted class. It is not "
+                "a guarantee that the diagnosis is correct. Use the result together "
+                "with visible symptoms and agricultural expert guidance.")
+
+    return ("I can help with crop diseases, symptoms, prevention, treatment and general "
+            "plant health. Try asking about tomato, potato, maize, rice, soybean, "
+            "early blight, late blight or disease prevention.")
+
+
+@app.route("/chat", methods=["POST"])
+def agriculture_chat():
+    try:
+        data = request.get_json(silent=True) or {}
+        user_message = str(data.get("message", "")).strip()
+
+        if not user_message:
+            return jsonify({
+                "success": False,
+                "message": "Please enter a message."
+            }), 400
+
+        return jsonify({
+            "success": True,
+            "reply": agriculture_chat_response(user_message)
+        })
+
+    except Exception as error:
+        print("Chatbot Error:", error)
+        return jsonify({
+            "success": False,
+            "message": "Unable to process the chatbot request."
+        }), 500
+
+
+# =========================================================
+# START SERVER
+# =========================================================
 
 if __name__ == "__main__":
-    print("PlantCare OpenCV Backend Starting...")
-    print("No Machine Learning, Deep Learning, or CNN")
+
     app.run(
-        host="127.0.0.1",
-        port=5000,
-        debug=True
+        debug=True,
+        port=5000
     )

@@ -873,9 +873,8 @@ function showResult(data) {
 
     if (resultConfidence) {
 
-        
-resultConfidence.textContent =
-    "Not applicable (rule-based analysis)";
+        resultConfidence.textContent =
+            data.confidence + "%";
 
     }
 
@@ -994,34 +993,113 @@ resultConfidence.textContent =
     }
 
 
-    // =====================================================
-    // OPENCV SYMPTOM ANALYSIS
-    // =====================================================
+    // =================================================
+    // TOP 3 AI PREDICTIONS
+    // =================================================
 
     const topPredictionsContainer =
-        document.getElementById("topPredictions");
+        document.getElementById(
+            "topPredictions"
+        );
+
 
     if (topPredictionsContainer) {
 
-        topPredictionsContainer.innerHTML = "";}
+        // Remove previous predictions
+        topPredictionsContainer.innerHTML =
+            "";
 
-        const analysisMessage =
-            document.createElement("div");
 
-        analysisMessage.className = "prediction-row";
+        if (
+            Array.isArray(
+                data.top_predictions
+            )
+        ) {
 
-        analysisMessage.textContent =
-            "Analysis Method: OpenCV Digital Image Processing. " +
-            "Visible yellow, brown, and dark regions are analyzed " +
-            "using image processing rules. " +
-            "No AI predictions or confidence scores are used.";
+            data.top_predictions.forEach(
+                function (prediction) {
 
-        topPredictionsContainer.appendChild(
-            analysisMessage
-        );
+                    const item =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    item.className =
+                        "prediction-row";
+
+
+                    const confidence =
+                        Number(
+                            prediction.confidence
+                        ) || 0;
+
+
+                    item.innerHTML = `
+
+                        <div class="prediction-header">
+
+                            <span>
+                                ${prediction.name}
+                            </span>
+
+                            <strong>
+                                ${confidence.toFixed(2)}%
+                            </strong>
+
+                        </div>
+
+
+                        <div class="prediction-bar">
+
+                            <div
+                                class="prediction-fill"
+                                style="width: ${Math.min(
+                                    confidence,
+                                    100
+                                )}%;">
+                            </div>
+
+                        </div>
+
+                    `;
+
+
+                    topPredictionsContainer
+                        .appendChild(
+                            item
+                        );
+
+                }
+            );
+
+        }
+
     }
 
-    
+
+    // =================================================
+    // SHOW RESULT SECTION
+    // =================================================
+
+    if (resultSection) {
+
+        resultSection.style.display =
+            "block";
+
+
+        // Scroll to result
+        resultSection.scrollIntoView({
+
+            behavior: "smooth",
+
+            block: "start"
+
+        });
+
+    }
+
+}
 
 
 // =====================================================
