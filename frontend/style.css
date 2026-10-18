@@ -1176,3 +1176,44 @@ footer {
     }
 
 }
+
+/* Detailed plant and disease information */
+.plant-info-section,
+.disease-info-section {
+    display: none;
+    padding: 40px 20px;
+    background: #eef8ee;
+    text-align: center;
+}
+
+.plant-info-section h2,
+.disease-info-section h2 {
+    color: #17652b;
+    margin-bottom: 24px;
+}
+
+.info-card {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+    text-align: left;
+}
+
+.info-card h3 {
+    color: #237a37;
+    margin-top: 22px;
+    margin-bottom: 10px;
+}
+
+.info-card h3:first-child {
+    margin-top: 0;
+}
+
+.info-card p {
+    color: #333333;
+    line-height: 1.8;
+    margin-bottom: 16px;
+}

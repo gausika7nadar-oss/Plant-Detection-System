@@ -1098,10 +1098,216 @@ function showResult(data) {
         });
 
     }
-
+showPlantAndDiseaseInformation(data);
 }
 
+function showPlantAndDiseaseInformation(data) {
+    const plant = String(data.plant || "").toLowerCase();
+    const disease = String(data.disease || "").toLowerCase();
 
+    const plantInfo = {
+        tomato: {
+            title: "Tomato",
+            description:
+                "Tomato is a widely cultivated crop used fresh and in processed foods. Healthy plants need adequate sunlight, suitable soil, consistent watering, and good airflow.",
+            growing:
+                "Grow in a sunny location with well-drained soil. Water near the soil surface and avoid keeping the soil continuously waterlogged.",
+            care:
+                "Monitor leaves and stems regularly, remove plant debris, support plants when needed, and use balanced fertilizer according to local recommendations."
+        },
+        potato: {
+            title: "Potato",
+            description:
+                "Potato is a tuber crop used as a staple food around the world. Healthy foliage supports the growth of the underground tubers.",
+            growing:
+                "Use well-drained soil, adequate sunlight, and consistent moisture. Avoid prolonged waterlogging.",
+            care:
+                "Hill soil around plants as appropriate, monitor foliage for changes, rotate crops, and use healthy planting material."
+        },
+        apple: {
+            title: "Apple",
+            description:
+                "Apple is a temperate fruit tree. Healthy leaves support photosynthesis and fruit development throughout the growing season.",
+            growing:
+                "Apple trees generally need suitable winter chilling, good sunlight, well-drained soil, and care adapted to the local climate.",
+            care:
+                "Prune appropriately, maintain airflow, remove fallen leaves where practical, and monitor foliage and fruit for signs of disease."
+        },
+        corn: {
+            title: "Corn",
+            description:
+                "Corn is an important cereal crop grown for food, animal feed, and industrial uses.",
+            growing:
+                "Corn generally grows best with sufficient sunlight, fertile well-drained soil, and reliable moisture during important growth stages.",
+            care:
+                "Monitor leaves for unusual spots or discoloration, manage weeds, rotate crops, and follow local nutrient recommendations."
+        },
+        grape: {
+            title: "Grape",
+            description:
+                "Grapevines produce fruit for fresh consumption, juice, and other products. Leaf health is important for vine growth and fruit development.",
+            growing:
+                "Grapes generally require good sunlight, drainage, and airflow through the canopy.",
+            care:
+                "Train and prune vines appropriately, avoid excessive canopy moisture, and inspect leaves and fruit regularly."
+        },
+        pepper: {
+            title: "Bell Pepper",
+            description:
+                "Bell pepper is a vegetable crop that produces fruits in several colors. Healthy foliage supports fruit development.",
+            growing:
+                "Provide sunlight, well-drained soil, and consistent moisture while avoiding waterlogged roots.",
+            care:
+                "Monitor for pests and leaf spots, keep the growing area clean, and avoid unnecessary fertilizer or pesticide applications."
+        },
+        strawberry: {
+            title: "Strawberry",
+            description:
+                "Strawberry is a fruit crop grown for its edible berries. Healthy leaves help support flowering and fruit production.",
+            growing:
+                "Use suitable well-drained soil, adequate sunlight, and moisture appropriate for the local climate and variety.",
+            care:
+                "Remove damaged plant debris, maintain airflow, and inspect leaves and fruit regularly."
+        },
+        peach: {
+            title: "Peach",
+            description:
+                "Peach is a stone-fruit tree. Healthy leaves help support shoot growth and fruit development.",
+            growing:
+                "Peach trees need a suitable climate for their variety, sunlight, and well-drained soil.",
+            care:
+                "Prune appropriately for airflow, remove fallen plant debris when practical, and monitor leaves for abnormal spots or curling."
+        },
+        cherry: {
+            title: "Cherry",
+            description:
+                "Cherry trees produce stone fruits and require growing conditions suited to their variety and climate.",
+            growing:
+                "Provide appropriate sunlight, drainage, and climate conditions for the particular cherry variety.",
+            care:
+                "Monitor leaves and fruit, maintain tree health through appropriate pruning, and remove diseased debris when practical."
+        }
+    };
+
+    const diseaseInfo = {
+        healthy: {
+            title: "No Obvious Disease Symptoms",
+            description:
+                "The analysis did not identify a clear symptom pattern. This does not guarantee that the plant is disease-free.",
+            symptoms:
+                "Continue to watch for new spots, yellowing, wilting, curling, or unusual growth.",
+            management:
+                "Maintain suitable watering, nutrition, airflow, and routine monitoring."
+        },
+        early: {
+            title: "Possible Early Blight",
+            description:
+                "Early blight is a plant disease commonly associated with certain fungi and can affect crops such as tomato and potato. Image appearance alone cannot confirm it.",
+            symptoms:
+                "Possible signs include brown leaf spots, sometimes with concentric rings and yellowing around affected areas.",
+            management:
+                "Avoid prolonged leaf wetness, remove affected debris when appropriate, rotate crops, and consult local agricultural guidance before choosing a treatment."
+        },
+        late: {
+            title: "Possible Late Blight",
+            description:
+                "Late blight is a serious disease of potato and tomato associated with Phytophthora infestans. Confirmation requires more than a simple color-based image analysis.",
+            symptoms:
+                "Symptoms can include rapidly spreading irregular dark lesions and, in humid conditions, pale growth near lesion edges.",
+            management:
+                "Seek prompt advice from a local agricultural expert if suspected. Avoid moving potentially infected plants and follow locally approved disease-management guidance."
+        },
+        rust: {
+            title: "Possible Rust-Like Symptoms",
+            description:
+                "Rust diseases can affect various crops. Rust-colored marks alone are not enough to establish the cause.",
+            symptoms:
+                "Some rust diseases produce orange, reddish-brown, or dark powdery spots on leaves.",
+            management:
+                "Inspect both sides of the leaf, improve airflow where appropriate, and seek a crop-specific diagnosis before treatment."
+        },
+        scab: {
+            title: "Possible Scab Symptoms",
+            description:
+                "Scab diseases can affect crops including apple. The exact cause depends on the host plant and visible symptoms.",
+            symptoms:
+                "Some scab infections cause dark, rough, or corky spots on leaves or fruit.",
+            management:
+                "Remove fallen infected debris where appropriate, maintain canopy airflow, and consult local crop-specific guidance."
+        },
+        discoloration: {
+            title: "Leaf Discoloration",
+            description:
+                "Yellow, brown, or dark areas can be associated with disease, nutrient imbalance, watering stress, pests, aging, or image conditions. This result is not a confirmed diagnosis.",
+            symptoms:
+                "Look for yellowing, browning, dark patches, spots, curling, or changes in the distribution of color.",
+            management:
+                "Check watering, drainage, light, and the undersides of leaves. Compare several leaves and seek expert advice if symptoms spread."
+        }
+    };
+
+    let selectedPlant = null;
+
+    for (const key in plantInfo) {
+        if (plant.includes(key)) {
+            selectedPlant = plantInfo[key];
+            break;
+        }
+    }
+
+    const plantSection =
+        document.getElementById("plantInformationSection");
+    const diseaseSection =
+        document.getElementById("diseaseInformationSection");
+
+    if (selectedPlant && plantSection) {
+        document.getElementById("plantInfoTitle").textContent =
+            selectedPlant.title;
+
+        document.getElementById("plantInfoDescription").textContent =
+            selectedPlant.description;
+
+        document.getElementById("plantGrowingConditions").textContent =
+            selectedPlant.growing;
+
+        document.getElementById("plantCareRecommendations").textContent =
+            selectedPlant.care;
+
+        plantSection.style.display = "block";
+    } else if (plantSection) {
+        plantSection.style.display = "none";
+    }
+
+    let selectedDisease = diseaseInfo.discoloration;
+
+    if (disease.includes("healthy")) {
+        selectedDisease = diseaseInfo.healthy;
+    } else if (disease.includes("early blight")) {
+        selectedDisease = diseaseInfo.early;
+    } else if (disease.includes("late blight")) {
+        selectedDisease = diseaseInfo.late;
+    } else if (disease.includes("rust")) {
+        selectedDisease = diseaseInfo.rust;
+    } else if (disease.includes("scab")) {
+        selectedDisease = diseaseInfo.scab;
+    }
+
+    if (diseaseSection) {
+      if (diseaseSection && selectedDisease) {
+    const title = document.getElementById("diseaseInfoTitle");
+    const description = document.getElementById("diseaseInfoDescription");
+    const symptoms = document.getElementById("diseaseSymptoms");
+    const management = document.getElementById("diseaseManagement");
+
+    if (title) title.textContent = selectedDisease.title || "Disease Information";
+    if (description) description.textContent = selectedDisease.description || "Detailed information is not available.";
+    if (symptoms) symptoms.textContent = selectedDisease.symptoms || "Check the leaves for visible changes.";
+    if (management) management.textContent = selectedDisease.management || "Monitor the plant and consult an agricultural expert.";
+
+    diseaseSection.style.display = "block";
+}
+}
+}
 // =====================================================
 // INITIAL PAGE STATE
 // =====================================================
